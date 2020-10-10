@@ -71,31 +71,41 @@ function App() {
     if (lastKeyStrokeIsOperation || lastKeyStrokeIsEqual) return
     if (current.length === 1) {
       updateCurrent('0')
+    }else{
+      setCurrent(current.slice(0, -1))
+      setCurrentValue(current - 0)
     }
-    setCurrent(current.slice(0, -1))
-    setCurrentValue(current - 0)
   }
 
   const handleOperationClicked = (text) => {
     if (operation && !lastKeyStrokeIsOperation && !lastKeyStrokeIsEqual) {
-      calculate()
+      const calculateResult = calculate()
+      setOperation(text)
+      setPreviousValue(calculateResult)
+      setPrevious(calculateResult + text)
+      setLastKeyStrokeIsEqual(false)
+      setLastkeyStrokeIsOperation(true)
+    }    
+    else{
+      setOperation(text)
+      setPreviousValue(currentValue)
+      setPrevious(current + text)
+      setLastKeyStrokeIsEqual(false)
+      setLastkeyStrokeIsOperation(true)
     }
-    setOperation(text)
-    setPreviousValue(currentValue)
-    setPrevious(current + text)
-    setLastKeyStrokeIsEqual(false)
-    setLastkeyStrokeIsOperation(true)
   }
+
   const calculate = () => {
+    let calculationResult;
     switch (operation) {
       case '+':
-        updateCurrent(previousValue + currentValue + '')
+        calculationResult = previousValue + currentValue
         break
       case '-':
-        updateCurrent(previousValue - currentValue + '')
+        calculationResult = previousValue - currentValue
         break
       case '*':
-        updateCurrent(previousValue * currentValue + '')
+        calculationResult = previousValue * currentValue
         break
       case '÷':
         if (current === 0) {
@@ -103,21 +113,23 @@ function App() {
           resetState()
           setPrevious(expression)
           setCurrent('BOOM!')
-          return
+          return null
         } else {
-          updateCurrent(previousValue / currentValue + '')
+          calculationResult = previousValue / currentValue
           break
         }
+        default: break
     }
+    updateCurrent(calculationResult + '')
     setPrevious(previous + current)
     setLastkeyStrokeIsOperation(false)
     setLastKeyStrokeIsEqual(true)
+    return calculationResult;
   }
+  
   const updateCurrent = (value) => {
     setCurrent(value)
-    console.log(value - 0)
     setCurrentValue(value - 0)
-    console.log(currentValue)
   }
   const resetState = function () {
     setPrevious('')
